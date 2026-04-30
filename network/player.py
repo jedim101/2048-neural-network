@@ -1,6 +1,6 @@
 import random
 
-layers = [
+network = [
   {
     "weights": [
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -54,14 +54,18 @@ layers = [
   }
 ]
 
+def set_network(net):
+  global network
+  network = net
+
 def random_weights_and_biases():
-  for layer in layers:
+  for layer in network:
     layer["weights"] = [[random.random() for _ in range(len(layer["weights"][0]))] for _ in range(len(layer["weights"]))]
     layer["biases"] = [random.random() for _ in range(len(layer["biases"]))]
 
 def make_move(input_layer):
   current_layer = input_layer
-  for layer in layers:
+  for layer in network:
     previous_layer = current_layer
     current_layer = []
     for node_index in range(len(layer["weights"])):
@@ -69,7 +73,7 @@ def make_move(input_layer):
       for weight_index in range(len(layer["weights"][node_index])):
         node_value += layer["weights"][node_index][weight_index] * previous_layer[weight_index]
       node_value += layer["biases"][node_index]
-      current_layer.append(node_value)
+      current_layer.append(max(node_value, 0))
 
   max_value = max(current_layer)
   max_index = current_layer.index(max_value)

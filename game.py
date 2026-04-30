@@ -5,12 +5,7 @@ RIGHT = 1
 DOWN = 2
 LEFT = 3
 
-DEFAULT_BOARD = [ [0, 0, 0, 0],
-                  [0, 0, 0, 0],
-                  [0, 0, 0, 0],
-                  [0, 0, 0, 0] ]
-
-board = DEFAULT_BOARD.copy()
+board = []
 
 def print_board():
   for row in board:
@@ -49,13 +44,13 @@ def add_tile():
 
 def setup_game():
   global board
-  board = DEFAULT_BOARD.copy()
+  board = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
   add_tile()
   add_tile()
 
 def move(direction):
   global board
-  
+
   def transpose(board):
     return [list(row) for row in zip(*board)]
   
@@ -155,3 +150,6 @@ def play_game():
       print("Game Over")
       print("Score: ", get_score())
       break
+
+
+# play_game()
