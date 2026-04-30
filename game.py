@@ -1,3 +1,4 @@
+from math import log2
 import random
 
 UP = 0
@@ -151,5 +152,11 @@ def play_game():
       print("Score: ", get_score())
       break
 
-
-# play_game()
+def get_log_score():
+  score = 0
+  for i in range(len(board)):
+    for j in range(len(board[i])):
+      if board[i][j] == 0:
+        continue
+      score += log2(board[i][j])
+  return score
