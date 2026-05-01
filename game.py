@@ -1,4 +1,4 @@
-from math import log2
+import math
 import random
 
 UP = 0
@@ -8,23 +8,30 @@ LEFT = 3
 
 board = []
 
+score = 0
+
 def print_board():
   for row in board:
     colors = {
       0: "",
-      2: "\033[104m",   # Bright Blue Background
-      4: "\033[103m",   # Bright Yellow Background
-      8: "\033[102m",   # Bright Green Background
-      16: "\033[101m",  # Bright Red Background
-      32: "\033[105m",  # Bright Magenta Background
-      64: "\033[106m",  # Bright Cyan Background
-      128: "\033[107m", # Bright White Background
-      256: "\033[100m", # Bright Black/Grey Background
-      512: "\033[44m",  # Blue Background
- 
+      1: "\033[104m",   # Bright Blue Background
+      2: "\033[103m",   # Bright Yellow Background
+      3: "\033[102m",   # Bright Green Background
+      4: "\033[101m",  # Bright Red Background
+      5: "\033[105m",  # Bright Magenta Background
+      6: "\033[106m",  # Bright Cyan Background
+      7: "\033[107m", # Bright White Background
+      8: "\033[100m", # Bright Black/Grey Background
+      9: "\033[44m",  # Blue Background
+      10: "\033[42m", # Green Background
+      11: "\033[41m", # Red Background
+      12: "\033[43m", # Yellow Background
+      13: "\033[45m", # Magenta Background
+      14: "\033[46m", # Cyan Background
     }
     for tile in row:
-      print(colors[tile] + str(tile) + (" " * (4 - len(str(tile)))), end="\033[0m ")
+      number_string = "--" if tile == 0 else str(int(math.pow(2, tile)))
+      print(colors[tile] + (" " * int(math.floor(3 - len(number_string) / 2))) + number_string + (" " * int(math.ceil(3 - len(number_string) / 2))), end="\033[0m")
     print()
 
 def get_empty_tiles():
@@ -41,10 +48,11 @@ def add_tile():
   empty_tiles = get_empty_tiles()
   if len(empty_tiles) > 0:
     random_tile = random.choice(empty_tiles)
-    board[random_tile[0]][random_tile[1]] = 2 if random.random() < 0.9 else 4
+    board[random_tile[0]][random_tile[1]] = 1 if random.random() < 0.9 else 2
 
 def setup_game():
-  global board
+  global board, score
+  score = 0
   board = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
   add_tile()
   add_tile()
@@ -62,14 +70,19 @@ def move(direction):
     return board[::-1]
 
   def move_left(board):
+    global score
+
     new_board = []
     for i in range(len(board)):
       row = [tile for tile in board[i] if tile != 0]
       j = 0
       while j < len(row) - 1:
         if row[j] == row[j + 1]:
-          row[j] = row[j] * 2
+          score += math.pow(2, row[j] + 1)
+
+          row[j] = row[j] + 1
           row.pop(j + 1)
+
 
         j += 1
       row = row + [0] * (len(board[i]) - len(row))
@@ -89,8 +102,6 @@ def move(direction):
     return False
   else:
     board = new_board
-    add_tile()
-
     return True
 
 def is_game_over():
@@ -109,10 +120,10 @@ def is_game_over():
   return True
 
 def get_score():
-  score = 0
-  for i in range(len(board)):
-    for j in range(len(board[i])):
-      score += board[i][j]
+  # score = 0
+  # for i in range(len(board)):
+  #   for j in range(len(board[i])):
+  #     score += math.pow(2, board[i][j]) if board[i][j] != 0 else 0
   return score
 
 def get_board_as_player_input():
@@ -144,7 +155,7 @@ def play_game():
 
     print()
     print_board()
-    print(get_board_as_player_input())
+    print("Score: ", get_score())
     print()
 
     if is_game_over():
@@ -158,5 +169,7 @@ def get_log_score():
     for j in range(len(board[i])):
       if board[i][j] == 0:
         continue
-      score += log2(board[i][j])
+      score += board[i][j]
   return score
+
+# play_game()

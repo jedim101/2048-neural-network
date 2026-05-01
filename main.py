@@ -1,88 +1,114 @@
+from turtle import screensize
 import agent
 import game
-import random
 import time
 
 start_time = time.time()
 
-iterations = 100000
-
-round_data = []
+iterations = 10000
 
 agent.random_weights_and_biases()
+agent.save_network()
 
 round_start_time = time.time()
 
-total_invalid_move_count = 0
-total_score = 0
-
+score_history = []
+invalid_move_history = []
+invalid_move_percentage_history = []
+total_reward_history = []
 
 for i in range(iterations):
+  iteration_start_time = time.time()
+  total_reward = 0
+
+  # for _ in range(100):
+  #   print()
+
+  moves_count = 0
 
   invalid_move_count = 0
+
   reward = 0
 
+  agent.reset_variables()
+
   game.setup_game()
+  # game.print_board()
 
   while not game.is_game_over():
+    moves_count += 1
 
     state = game.get_board_as_player_input()
-    initial_log_score = game.get_log_score()
+
+    initial_score = game.get_score()
 
     move = agent.make_move(state, reward)
 
-    new_log_score = game.get_log_score()
-    reward = new_log_score - initial_log_score
+    reward = 0
 
-    if not game.move(move):
+    legal_move = game.move(move)
+
+    if not legal_move:
       invalid_move_count += 1
-      reward -= 100
-      while not game.move(random.randint(0, 3)):
-        pass
+      reward = -100
 
-    game.print_board()
-    print("Iteration:", i + 1)
-    print("Move: ", move)
-    print("Log score: ", new_log_score)
-    print("Reward: ", reward)
-    print("Score:", game.get_score())
-    print("Invalid move count:", invalid_move_count)
-    print("Average Score:", total_score / (i + 1), "Average Invalid move count:", total_invalid_move_count / (i + 1))
-    print()
+    new__score = game.get_score()
 
-  
-  total_invalid_move_count += invalid_move_count
-  total_score += game.get_score()
+    reward += (new__score - initial_score)
+    total_reward += reward
+
+    if legal_move:
+      game.add_tile()
+
+    # print()
+    # print()
+    # print()
+    
+    # print("Move:", "UP" if move == 0 else "RIGHT" if move == 1 else "DOWN" if move == 2 else "LEFT")
+    # print()
+    # print("move #:", moves_count)
+    # game.print_board()
+    # print("Score:", game.get_score())
+    # print()
+    # print("Reward:", reward)
+
+  agent.make_move(None, reward)
+
+  agent.decay_epsilon()
+
+  agent.save_network()
+
+  score_history.append(str(int(game.get_score())))
+  invalid_move_history.append(str(invalid_move_count))
+  invalid_move_percentage_history.append(str(invalid_move_count / moves_count))
+  total_reward_history.append(str(total_reward))
 
   print()
-  # game.print_board()
-  # print("Invalid move count: ", invalid_move_count)
-  # print("Score: ", game.get_score())
-  print("Iteration:", i + 1, "Score:", game.get_score(), "Invalid move count:", invalid_move_count, "Average Score:", total_score / (i + 1), "Average Invalid move count:", total_invalid_move_count / (i + 1))
+  game.print_board()
+  print("Iteration:", i + 1)
+  print("Moves count: ", moves_count)
+  print("Score: ", game.get_score())
+  print("Log score: ", game.get_log_score())
+  print("Invalid move count: ", invalid_move_count)
+  print("Epsilon: ", agent.epsilon)
+  print("Total reward: ", total_reward)
+  print("Iteration time: ", time.time() - iteration_start_time)
+  print()
 
 
-for i in range(100):
+for i in range(10):
   print()
 print("Iterations: ", iterations)
 print("Time taken: ", time.time() - round_start_time, "seconds")
-print("Total invalid move count: ", total_invalid_move_count)
-print("Total score: ", total_score)
-print("Average invalid move count: ", total_invalid_move_count / iterations)
-print("Average score: ", total_score / iterations)
-
-round_data.append({
-  "average_invalid_move_count": total_invalid_move_count / iterations,
-  "average_score": total_score / iterations,
-  "time_taken": time.time() - round_start_time,
-})
-
-print("--------------------------------")
-print("Round data:")
-for i in range(len(round_data)):
-  print("Round: ", i + 1)
-  print("Average invalid move count: ", round_data[i]["average_invalid_move_count"])
-  print("Average score: ", round_data[i]["average_score"])
-  print("Time taken: ", round_data[i]["time_taken"])
-  print()
+print()
 
 print("Total time taken: ", time.time() - start_time)
+
+print()
+print("Score history:\n", "\n".join(score_history))
+print()
+print("Invalid move history:\n", "\n".join(invalid_move_history))
+print()
+print("Invalid move percentage history:\n", "\n".join(invalid_move_percentage_history))
+print()
+print("Total reward history:\n", "\n".join(total_reward_history))
