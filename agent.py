@@ -8,7 +8,7 @@ MIN_EPSILON = 0.05
 
 epsilon = MAX_EPSILON
 
-EPSILON_DECAY_FACTOR = 0.0001
+EPSILON_DECAY_FACTOR = 0.001
 
 LEARNING_RATE = 0.01
 
@@ -128,7 +128,7 @@ def backprop(expected_return, action_index):
 
     dL_da = new_dL_da
 
-def make_move(state, reward):
+def make_move(state, reward, legal_moves):
   global previous_state, previous_action_index, epsilon
 
   if state is None and previous_state is not None:
@@ -151,10 +151,9 @@ def make_move(state, reward):
 
   previous_state = state
   if random.random() < epsilon:
-    previous_action_index = random.randint(0, 3) 
+    previous_action_index = random.choice(legal_moves)
   else:
-    previous_action_index = network_output.index(max(network_output))
-
+    previous_action_index = max(legal_moves, key=lambda a: network_output[a])
   return previous_action_index
 
 def decay_epsilon():

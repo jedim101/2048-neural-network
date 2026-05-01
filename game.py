@@ -172,4 +172,22 @@ def get_log_score():
       score += board[i][j]
   return score
 
+def is_legal_move(direction):
+  global board, score
+  board_copy = [row[:] for row in board]
+  score_copy = score
+
+  legal = move(direction)
+
+  board = board_copy
+  score = score_copy
+  return legal
+
+def get_legal_moves():
+  legal_moves = []
+  for direction in [UP, RIGHT, DOWN, LEFT]:
+    if is_legal_move(direction):
+      legal_moves.append(direction)
+  return legal_moves
+
 # play_game()

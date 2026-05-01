@@ -5,7 +5,7 @@ import time
 
 start_time = time.time()
 
-iterations = 10000
+iterations = 1000
 
 agent.random_weights_and_biases()
 agent.save_network()
