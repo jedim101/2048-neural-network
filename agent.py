@@ -3,12 +3,12 @@ import copy
 import math
 
 GAMMA = 0.5
-MAX_EPSILON = 0.0
+MAX_EPSILON = 0.9
 MIN_EPSILON = 0.00
 
 epsilon = MAX_EPSILON
 
-EPSILON_DECAY_FACTOR = 0.0
+EPSILON_DECAY_FACTOR = 0.0001
 
 # Stabilized SGD: Huber TD loss + gradient clipping + modest step size
 LEARNING_RATE = 0.0005

@@ -8,15 +8,18 @@ start_time = time.time()
 
 iterations = 5000
 
-agent.random_weights_and_biases()
-# with open("network_params.json", "r") as f:
-#   agent.network_params = json.load(f)
+# agent.random_weights_and_biases()
+with open("network_params.json", "r") as f:
+  agent.network_params = json.load(f)
 
 agent.save_network()
 
 round_start_time = time.time()
 
-score_history = []
+total_score = 0
+total_moves_count = 0
+
+# score_history = []
 
 high_score = 0
 high_score_game_log = []
@@ -27,7 +30,6 @@ i = 0
 while True:
   i += 1
   iteration_start_time = time.time()
-  total_reward = 0
 
   game_log = []
 
@@ -58,8 +60,6 @@ while True:
 
     legal_moves = game.get_legal_moves()
     move = agent.make_move(state, reward, legal_moves)
-
-    total_reward += reward
 
     game.move(move)
 
@@ -92,18 +92,21 @@ while True:
 
   agent.save_network()
 
-  score_history.append(int(game.score))
+  # score_history.append(int(game.score))
+
+  total_score += game.score
+  total_moves_count += moves_count
 
   if game.score > high_score:
     high_score = game.score
     with open("game_log.json", "w") as f:
       json.dump(game_log, f)
 
-  with open("score_history.json", "r") as f:
-    score_history = json.load(f)
-    score_history.append(game.score)
-  with open("score_history.json", "w") as f:
-    json.dump(score_history, f)
+  # with open("score_history.json", "r") as f:
+  #   score_history = json.load(f)
+  #   score_history.append(game.score)
+  # with open("score_history.json", "w") as f:
+  #   json.dump(score_history, f)
   with open("network_params.json", "w") as f:
     json.dump(agent.network_params, f)
 
@@ -112,9 +115,10 @@ while True:
   print("Iteration:", i + 1)
   print("Moves count: ", moves_count)
   print("Score: ", game.score)
-  print("Log Tile Count: ", game.get_log_score())
+  print("High score: ", high_score)
+  print("Average score: ", total_score / (i + 1))
+  print("Average moves count: ", total_moves_count / (i + 1))
   print("Epsilon: ", agent.epsilon)
-  print("Total reward: ", total_reward)
   print("Iteration time: ", time.time() - iteration_start_time)
   # print("█" * int(i / iterations * 100) + "-" * (100 - int(i / iterations * 100)))
   print()
